@@ -1,52 +1,64 @@
 package com.ai;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 public class BFS {
 
     public State solutionState;
     public State initialState;
+    public String solutionPath;
     public char[] neighborhoodSearchOrder;
+    public List<State> visitedStates;
+    public boolean result;
+
 
     public BFS(State goalState, State initState, char[] searchOrder) {
-        solutionState = goalState;
-        initialState = initState;
-        neighborhoodSearchOrder = searchOrder;
+        this.solutionState = goalState;
+        this.initialState = initState;
+        this.neighborhoodSearchOrder = searchOrder;
     }
 
-    public String FindSolution() {
-
-        StringBuilder solution = new StringBuilder();
-
-        if (this.initialState.isPuzzleSame(this.solutionState)) {
-            solution = new StringBuilder("NO STEPS NEEDED");
+    public State findSolution(char[] order) {
+        if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)) {
+            return initialState;
         }
-
-        Queue<State> toVisit = new LinkedList<>();
-        Set<State> visited = new HashSet<>();
-        visited.add(this.initialState);
-        toVisit.add(this.initialState);
-
-        while(!toVisit.isEmpty()) {
-
-            State currentState = toVisit.poll();
-            currentState.generateNeighbours(neighborhoodSearchOrder);
-
-            for (State n : currentState.neighbours) {
-                if (n.isPuzzleSame(this.solutionState)) {
-                    return n.solution;
+        int depth = 0;
+        List<State> neighbours;
+        visitedStates = new ArrayList<>();
+        Queue<State> queue = new LinkedList<>();
+        queue.add(initialState);
+        result = false;
+        while (!queue.isEmpty()) {
+            State currentNode = queue.remove();
+            if (Arrays.deepEquals(currentNode.puzzle, solutionState.puzzle)) {
+                result = true;
+                getSolutionPath(currentNode);
+                System.out.println(solutionPath);
+                return currentNode;
+            }
+            if (!visitedStates.contains(currentNode)) {
+                visitedStates.add(currentNode);
+            }
+            neighbours = currentNode.generateNeighbours(order);
+            for (State n : neighbours) {
+                if (!visitedStates.contains(n)) {
+                    queue.add(n);
                 }
-                if (!visited.contains(n)) {
-                    visited.add(n);
-                    toVisit.add(n);
-                }
-
             }
         }
-        return solution.toString();
 
+        System.out.println(solutionPath);
+        return null;
+    }
+    public void getSolutionPath(State actual) {
+        while (actual.havePrev) {
+            solutionPath += actual.step;
+            for (State n : visitedStates) {
+                if (actual.prevId == n.id) {
+                    actual = n;
+                    break;
+                }
+            }
+        }
     }
 }

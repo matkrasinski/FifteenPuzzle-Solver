@@ -1,76 +1,55 @@
 package com.ai;
 
-import com.sun.security.jgss.GSSUtil;
-
-import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Collections;
 
 public class State {
 
     public State prevState;
-    public List<State> neighbours;
     public int[][] puzzle;
     public char step;
     public String solution;
     public int width, height;
     public Point zeroIndex;
     public int depth = 0;
+    public boolean havePrev;
+    public int prevId;
+    public int id;
 
 
-    public State(int[][] puzzle,int puzzleWidth, int puzzleHeight, Point zeroIndex) {
-        this.neighbours = new ArrayList<>();
-        this.width = puzzleWidth;
-        this.height = puzzleHeight;
+    public State(int[][] puzzle,  int previousID) {
         this.puzzle = puzzle;
-        this.zeroIndex = zeroIndex;
-        this.solution = "";
+        this.zeroIndex = findZero();
+        this.havePrev = false;
+        this.prevId = previousID;
+        this.id = hashCode();
+        this.width = puzzle[0].length;
+        this.height = puzzle.length;
+    }
+    public State(int[][] puzzle){
+        this.puzzle = puzzle;
+        this.width = puzzle[0].length;
+        this.height = puzzle.length;
+        this.havePrev = false;
+        this.depth = 0;
+        this.id = hashCode();
+        this.zeroIndex = findZero();
     }
     public State(State state) {
-        this.neighbours = new ArrayList<>();
         this.puzzle = state.puzzle;
         this.prevState = state.prevState;
         this.zeroIndex = state.zeroIndex;
         this.solution = state.solution;
     }
-    public State move(char direction) {
-        State newState = new State(this);
-        newState.step = direction;
-        newState.solution += direction;
-        newState.prevState = this;
-        newState.depth = depth + 1;
-        switch (direction) {
-            case 'u' -> newState.zeroIndex.x--;
-            case 'd' -> newState.zeroIndex.x++;
-            case 'l' -> newState.zeroIndex.y--;
-            case 'r' -> newState.zeroIndex.y++;
-            default -> {
-            }
-        }
-        swap(newState.puzzle, zeroIndex.x, zeroIndex.y, zeroIndex.x, zeroIndex.y);
-//        System.out.println(zeroIndex.x + " " + zeroIndex.y);
-        return newState;
+    public State(char direction, int[][] puzzle, int prevID) {
+        this.puzzle = puzzle;
+        this.step = direction;
+        this.zeroIndex = findZero();
+        this.havePrev = true;
+        this.id = hashCode();
+        this.prevId = prevID;
     }
-    public boolean isMovePossible(char direction) {
-
-        if (direction == 'd' && zeroIndex.x == 3) {
-            return false;
-        }
-        if (direction == 'u' && zeroIndex.x == 0) {
-            return false;
-        }
-        if (direction == 'r' && zeroIndex.y == 3) {
-            return false;
-        }
-        return direction != 'l' || zeroIndex.y != 0;
-
-    }
-    public static String charToString(char c) {
-        return String.valueOf(c);
-    }
-
     public void print() {
         for(int i = 0; i < height;i++) {
             for (int j = 0; j < width; j++) {
@@ -79,51 +58,58 @@ public class State {
             System.out.println();
         }
     }
-
-    public boolean isSolution()
-    {
-        int correctValue = 1;
-        for (int i = 0; i < this.width; i++) {
-            for (int j = 0; j < this.height; j++) {
-                if (i == this.width - 1 && j == this.height - 1) {
-                    break;
-                }
-                if (puzzle[i][j] != correctValue++) {
-                    return false;
-                }
+    public List<State> generateNeighbours(char[] order) {
+        List<State> neighbours = new ArrayList<>();
+        for (char step : order) {
+            if(canMove(step)) {
+                neighbours.add(new State(step, move(step), id));
             }
         }
-        return true;
+        return neighbours;
     }
+    public boolean canMove(char direction) {
+        return (zeroIndex.y != 0 && direction == 'U') ||
+                (zeroIndex.y != puzzle.length - 1 && direction == 'D') ||
+                (zeroIndex.x != 0 && direction == 'L') ||
+                (zeroIndex.x != puzzle.length - 1) && direction == 'R';
+    }
+    public int[][] move(char direction) {
+        int[][] childPuzzle = new int[puzzle.length][puzzle[0].length];
 
-    public boolean isPuzzleSame(State other) {
-        for (int i = 0; i < this.height; i++) {
-            for (int j = 0; j < this.width; j++) {
-                if(this.puzzle[i][j] != other.puzzle[i][j]) {
-                    return false;
-                }
+        for (int i = 0; i < puzzle.length; i++) {
+            System.arraycopy(puzzle[i], 0, childPuzzle[i], 0, puzzle.length);
+        }
+
+        switch (direction) {
+            case 'U' ->
+                swap(childPuzzle, zeroIndex.y,zeroIndex.x, zeroIndex.y - 1,zeroIndex.x);
+            case 'D' ->
+                swap(childPuzzle, zeroIndex.y,zeroIndex.x, zeroIndex.y + 1,zeroIndex.x);
+            case 'R' ->
+                swap(childPuzzle, zeroIndex.y,zeroIndex.x, zeroIndex.y,zeroIndex.x + 1);
+            case 'L' ->
+                swap(childPuzzle, zeroIndex.y,zeroIndex.x, zeroIndex.y,zeroIndex.x - 1);
+            default -> {
             }
         }
-        return true;
+        return childPuzzle;
     }
-
-    public void generateNeighbours(char[] order) {
-        for(char direction : order) {
-            if(isMovePossible(direction) && isMovePossible(direction)) {
-                neighbours.add(move(direction));
-            }
-        }
-    }
-    private boolean isNotGoingBack(char direction) {
-        return (this.step != 'l' || direction != 'r') &&
-                (this.step != 'u' || direction != 'd') &&
-                (this.step != 'r' || direction != 'l') &&
-                (this.step != 'd' || direction != 'u');
-    }
-
     public static void swap(int[][] arr, int i1, int j1, int i2, int j2) {
         int tmp = arr[i1][j1];
         arr[i1][j1] = arr[i2][j2];
         arr[i2][j2] = tmp;
+    }
+    public Point findZero() {
+        int x = 0, y = 0;
+        for(int i=0 ; i< puzzle.length ; i ++){
+            for (int j = 0; j < puzzle.length; j++) {
+                if(puzzle[i][j] == 0){
+                    x = j;
+                    y = i;
+                    break;
+                }
+            }
+        }
+        return new Point(x, y);
     }
 }
