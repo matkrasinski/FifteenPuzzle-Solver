@@ -9,7 +9,6 @@ public class State {
     public State prevState;
     public int[][] puzzle;
     public char step;
-    public String solution;
     public int width, height;
     public Point zeroIndex;
     public int depth = 0;
@@ -40,15 +39,15 @@ public class State {
         this.puzzle = state.puzzle;
         this.prevState = state.prevState;
         this.zeroIndex = state.zeroIndex;
-        this.solution = state.solution;
     }
-    public State(char direction, int[][] puzzle, int prevID) {
+    public State(char direction, int[][] puzzle, int prevID, int depth) {
         this.puzzle = puzzle;
         this.step = direction;
         this.zeroIndex = findZero();
         this.havePrev = true;
         this.id = hashCode();
         this.prevId = prevID;
+        this.depth = depth + 1;
     }
     public void print() {
         for(int i = 0; i < height;i++) {
@@ -62,7 +61,7 @@ public class State {
         List<State> neighbours = new ArrayList<>();
         for (char step : order) {
             if(canMove(step)) {
-                neighbours.add(new State(step, move(step), id));
+                neighbours.add(new State(step, move(step), id, depth));
             }
         }
         return neighbours;
@@ -111,5 +110,11 @@ public class State {
             }
         }
         return new Point(x, y);
+    }
+    public int getMaxDepth(int depth) {
+        if (depth < this.depth) {
+            depth = this.depth;
+        }
+        return depth;
     }
 }

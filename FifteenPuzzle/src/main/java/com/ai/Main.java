@@ -8,19 +8,23 @@ public class Main {
                                         {9,10,11,12},
                                         {13,14,15,0}};
     public static State goalState = new State(goalPuzzle);
-    public static int[][] startPuzzle = {{1,0,3,4},
-                                         {5,2,6,7},
+    public static int[][] startPuzzle = {{5,1,3,4},
+                                         {0,2,6,7},
                                          {9,10,11,8},
                                          {13,14,15,12}};
+    
     public static State startState = new State(startPuzzle);
 
     public static char[] order = {'U','R','L','D'};
-    public static BFS bfs = new BFS(goalState, startState, order);
+    public static BFS bfs = new BFS(goalState, startState);
+    public static DFS dfs = new DFS(goalState, startState);
 
     public static void main(String[] args) {
-        System.out.println(Arrays.deepToString(startState.puzzle));
+        System.out.println("Start : " + Arrays.deepToString(startState.puzzle));
         State foundState = bfs.findSolution(order);
-        System.out.println(Arrays.deepToString(foundState.puzzle));
+        System.out.println("BFS : " + Arrays.deepToString(foundState.puzzle));
+        State foundState2 = dfs.findSolution(order);
+        System.out.println("DFS : " + Arrays.deepToString(foundState2.puzzle));
 //        List<State> list = startState.generateChildren(order);
 //
 //        for (State s : list) {

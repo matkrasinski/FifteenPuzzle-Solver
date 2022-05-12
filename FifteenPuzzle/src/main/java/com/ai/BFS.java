@@ -6,59 +6,53 @@ public class BFS {
 
     public State solutionState;
     public State initialState;
-    public String solutionPath;
-    public char[] neighborhoodSearchOrder;
-    public List<State> visitedStates;
+    public String solutionPath = "";
+    public Set<State> closed;
+    public Queue<State> visited;
     public boolean result;
 
 
-    public BFS(State goalState, State initState, char[] searchOrder) {
+    public BFS(State goalState, State initState) {
         this.solutionState = goalState;
         this.initialState = initState;
-        this.neighborhoodSearchOrder = searchOrder;
     }
-
     public State findSolution(char[] order) {
         if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)) {
             return initialState;
         }
-        int depth = 0;
-        List<State> neighbours;
-        visitedStates = new ArrayList<>();
-        Queue<State> queue = new LinkedList<>();
-        queue.add(initialState);
-        result = false;
-        while (!queue.isEmpty()) {
-            State currentNode = queue.remove();
-            if (Arrays.deepEquals(currentNode.puzzle, solutionState.puzzle)) {
-                result = true;
-                getSolutionPath(currentNode);
-                System.out.println(solutionPath);
-                return currentNode;
-            }
-            if (!visitedStates.contains(currentNode)) {
-                visitedStates.add(currentNode);
-            }
-            neighbours = currentNode.generateNeighbours(order);
-            for (State n : neighbours) {
-                if (!visitedStates.contains(n)) {
-                    queue.add(n);
+        visited = new LinkedList<>();
+        closed = new HashSet<>();
+        visited.add(initialState);
+        closed.add(initialState);
+        while (!visited.isEmpty()) {
+            State currentNode = visited.remove();
+            for (State n : currentNode.generateNeighbours(order)) {
+                if (Arrays.deepEquals(n.puzzle, solutionState.puzzle)) {
+                    getSolutionPath(n);
+                    System.out.println(solutionPath);
+                    return n;
+                }
+                if (!closed.contains(n)) {
+                    visited.add(n);
+                    closed.add(n);
                 }
             }
         }
-
-        System.out.println(solutionPath);
         return null;
+
     }
-    public void getSolutionPath(State actual) {
-        while (actual.havePrev) {
-            solutionPath += actual.step;
-            for (State n : visitedStates) {
-                if (actual.prevId == n.id) {
-                    actual = n;
+
+    public void getSolutionPath(State current) {
+        StringBuilder stringBuilder = new StringBuilder(solutionPath);
+        while (current.havePrev) {
+            stringBuilder.append(current.step);
+            for (State n : closed) {
+                if (current.prevId == n.id) {
+                    current = n;
                     break;
                 }
             }
         }
+        solutionPath = stringBuilder.reverse().toString();
     }
 }
