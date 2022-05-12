@@ -18,6 +18,7 @@ public class DFS {
         if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)){
             return initialState;
         }
+        int maxDepth = 25;
         List<State> neighbours;
         visited = new Stack<>();
         closed = new HashSet<>();
@@ -25,7 +26,7 @@ public class DFS {
 
         while (!visited.isEmpty()) {
             State currentNode = visited.pop();
-            if (!closed.contains(currentNode) && currentNode.depth < currentNode.getMaxDepth(7)) {
+            if (!closed.contains(currentNode) && currentNode.depth <  maxDepth) {
                 closed.add(currentNode);
                 neighbours = currentNode.generateNeighbours(order);
                 Collections.reverse(neighbours);
@@ -33,6 +34,7 @@ public class DFS {
                     if (Arrays.deepEquals(n.puzzle, solutionState.puzzle)){
                         getSolutionPath(n);
                         System.out.println(solutionPath);
+                        solutionPath = "";
                         return n;
                     }
                     visited.push(n);

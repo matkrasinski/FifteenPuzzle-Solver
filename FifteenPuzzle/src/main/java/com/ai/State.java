@@ -4,28 +4,19 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class State {
+public class State implements Comparable<State> {
 
     public State prevState;
     public int[][] puzzle;
     public char step;
     public int width, height;
     public Point zeroIndex;
-    public int depth = 0;
+    public int depth;
     public boolean havePrev;
     public int prevId;
     public int id;
+    public int priority;
 
-
-    public State(int[][] puzzle,  int previousID) {
-        this.puzzle = puzzle;
-        this.zeroIndex = findZero();
-        this.havePrev = false;
-        this.prevId = previousID;
-        this.id = hashCode();
-        this.width = puzzle[0].length;
-        this.height = puzzle.length;
-    }
     public State(int[][] puzzle){
         this.puzzle = puzzle;
         this.width = puzzle[0].length;
@@ -35,12 +26,23 @@ public class State {
         this.id = hashCode();
         this.zeroIndex = findZero();
     }
-    public State(State state) {
+    public State(State state, int priority) {
         this.puzzle = state.puzzle;
         this.prevState = state.prevState;
         this.zeroIndex = state.zeroIndex;
+        this.depth = state.depth;
+        this.id = state.id;
+        this.prevId = state.prevId;
+        this.width = state.width;
+        this.height = state.height;
+        this.step = state.step;
+        this.priority = priority;
+        this.havePrev = state.havePrev;
+
     }
     public State(char direction, int[][] puzzle, int prevID, int depth) {
+        this.width = puzzle[0].length;
+        this.height = puzzle.length;
         this.puzzle = puzzle;
         this.step = direction;
         this.zeroIndex = findZero();
@@ -67,10 +69,10 @@ public class State {
         return neighbours;
     }
     public boolean canMove(char direction) {
-        return (zeroIndex.y != 0 && direction == 'U') ||
+        return ((zeroIndex.y != 0 && direction == 'U') ||
                 (zeroIndex.y != puzzle.length - 1 && direction == 'D') ||
                 (zeroIndex.x != 0 && direction == 'L') ||
-                (zeroIndex.x != puzzle.length - 1) && direction == 'R';
+                (zeroIndex.x != puzzle.length - 1) && direction == 'R') && isNotGoingBack(direction);
     }
     public int[][] move(char direction) {
         int[][] childPuzzle = new int[puzzle.length][puzzle[0].length];
@@ -111,10 +113,18 @@ public class State {
         }
         return new Point(x, y);
     }
-    public int getMaxDepth(int depth) {
-        if (depth < this.depth) {
-            depth = this.depth;
-        }
-        return depth;
+    private boolean isNotGoingBack(char direction) {
+        return (this.step != 'L' || direction != 'R') &&
+                (this.step != 'U' || direction != 'D') &&
+                (this.step != 'R' || direction != 'L') &&
+                (this.step != 'D' || direction != 'U');
+    }
+    public void setPriority(int newValue) {
+        this.priority = newValue;
+    }
+
+    @Override
+    public int compareTo(State o) {
+        return Integer.compare(this.priority, o.priority);
     }
 }

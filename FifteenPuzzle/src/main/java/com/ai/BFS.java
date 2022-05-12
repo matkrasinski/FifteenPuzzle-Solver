@@ -30,6 +30,7 @@ public class BFS {
                 if (Arrays.deepEquals(n.puzzle, solutionState.puzzle)) {
                     getSolutionPath(n);
                     System.out.println(solutionPath);
+                    solutionPath = "";
                     return n;
                 }
                 if (!closed.contains(n)) {
@@ -52,6 +53,7 @@ public class BFS {
                     break;
                 }
             }
+
         }
         solutionPath = stringBuilder.reverse().toString();
     }
