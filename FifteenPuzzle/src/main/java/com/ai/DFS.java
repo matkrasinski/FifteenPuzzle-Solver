@@ -2,19 +2,18 @@ package com.ai;
 
 import java.util.*;
 
-public class DFS {
-    public State solutionState;
-    public State initialState;
-    public String solutionPath = "";
-    public Stack<State> visited;
-    public Set<State> closed;
-    public boolean result;
+public class DFS extends Strategy{
 
-    public DFS(State goalState, State initState) {
-        this.solutionState = goalState;
-        this.initialState = initState;
+
+    public DFS(State solutionState, State initialState) {
+        super(solutionState, initialState);
     }
+
+    public Stack<State> visited;
+
+    @Override
     public State findSolution(char[] order) {
+        long start = System.nanoTime();
         if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)){
             return initialState;
         }
@@ -23,17 +22,23 @@ public class DFS {
         visited = new Stack<>();
         closed = new HashSet<>();
         visited.push(initialState);
+        long end;
 
         while (!visited.isEmpty()) {
             State currentNode = visited.pop();
             if (!closed.contains(currentNode) && currentNode.depth <  maxDepth) {
+                max = currentNode.depth;
                 closed.add(currentNode);
                 neighbours = currentNode.generateNeighbours(order);
                 Collections.reverse(neighbours);
+
                 for (State n : neighbours) {
-                    if (Arrays.deepEquals(n.puzzle, solutionState.puzzle)){
-                        getSolutionPath(n);
+                    if (isSolved(n, solutionState)){
+                        solutionPath = Path.getSolutionPath(n, closed);
                         System.out.println(solutionPath);
+                        max = n.depth;
+                        end = System.nanoTime();
+                        data = new Data(n.depth, visited.size(), closed.size(), max, end - start);
                         solutionPath = "";
                         return n;
                     }
@@ -41,19 +46,10 @@ public class DFS {
                 }
             }
         }
+        end = System.nanoTime();
+        data = new Data(-1, visited.size(), closed.size(), max, end - start);
         return null;
     }
-    public void getSolutionPath(State current) {
-        StringBuilder stringBuilder = new StringBuilder(solutionPath);
-        while (current.havePrev) {
-            stringBuilder.append(current.step);
-            for (State n : closed) {
-                if (current.prevId == n.id) {
-                    current = n;
-                    break;
-                }
-            }
-        }
-        solutionPath = stringBuilder.reverse().toString();
-    }
+
+
 }

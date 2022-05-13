@@ -2,21 +2,28 @@ package com.ai;
 
 import java.util.*;
 
-public class BFS {
+public class BFS extends Strategy{
 
-    public State solutionState;
-    public State initialState;
-    public String solutionPath = "";
-    public Set<State> closed;
     public Queue<State> visited;
-    public boolean result;
 
-
-    public BFS(State goalState, State initState) {
-        this.solutionState = goalState;
-        this.initialState = initState;
+    public BFS(State solutionState, State initialState) {
+        super(solutionState, initialState);
     }
+
+//    public State solutionState;
+//    public State initialState;
+//    public String solutionPath = "";
+//    public Set<State> closed;
+//    public Queue<State> visited;
+//
+//    public BFS(State goalState, State initState) {
+//        this.solutionState = goalState;
+//        this.initialState = initState;
+//    }
+
+    @Override
     public State findSolution(char[] order) {
+        long start = System.nanoTime();
         if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)) {
             return initialState;
         }
@@ -24,12 +31,19 @@ public class BFS {
         closed = new HashSet<>();
         visited.add(initialState);
         closed.add(initialState);
+        int visitedSize = 0;
+        long end;
         while (!visited.isEmpty()) {
             State currentNode = visited.remove();
+            visitedSize++;
+            max = currentNode.depth;
             for (State n : currentNode.generateNeighbours(order)) {
-                if (Arrays.deepEquals(n.puzzle, solutionState.puzzle)) {
-                    getSolutionPath(n);
+                if (isSolved(n, solutionState)) {
+                    solutionPath = Path.getSolutionPath(n, closed);
                     System.out.println(solutionPath);
+                    max = n.depth;
+                    end = System.nanoTime();
+                    data = new Data(n.depth, visitedSize, closed.size(), max, end - start);
                     solutionPath = "";
                     return n;
                 }
@@ -39,22 +53,9 @@ public class BFS {
                 }
             }
         }
+        end = System.nanoTime();
+        data = new Data(-1, visited.size(), closed.size(), max, end - start);
         return null;
-
     }
 
-    public void getSolutionPath(State current) {
-        StringBuilder stringBuilder = new StringBuilder(solutionPath);
-        while (current.havePrev) {
-            stringBuilder.append(current.step);
-            for (State n : closed) {
-                if (current.prevId == n.id) {
-                    current = n;
-                    break;
-                }
-            }
-
-        }
-        solutionPath = stringBuilder.reverse().toString();
-    }
 }
