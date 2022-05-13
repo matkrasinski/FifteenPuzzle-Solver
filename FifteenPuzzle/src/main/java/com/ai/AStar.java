@@ -16,9 +16,11 @@ public class AStar extends Strategy{
         }
     }
 
+
     public State findSolution(char[] order) {
         long start = System.nanoTime();
         if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)) {
+            data = new Data(0);
             return initialState;
         }
         visited = new PriorityQueue<>();
@@ -30,11 +32,11 @@ public class AStar extends Strategy{
             State currentNode = visited.remove();
             max = currentNode.depth;
             if (isSolved(currentNode, solutionState)) {
-                solutionPath = Path.getSolutionPath(currentNode, closed);
+                //solutionPath = Path.getSolutionPath(currentNode, closed);
                 System.out.println(solutionPath);
                 max = currentNode.depth;
                 end = System.nanoTime();
-                data = new Data(currentNode.depth, visited.size(), closed.size(), max, end - start);
+                data = new Data(visited.size(), closed.size(), max, end - start, solutionPath);
                 solutionPath = "";
                 return currentNode;
             }
@@ -50,8 +52,7 @@ public class AStar extends Strategy{
                 }
             }
         }
-        end = System.nanoTime();
-        data = new Data(-1, visited.size(), closed.size(), max, end - start);
+        data = new Data(-1);
         return null;
     }
 

@@ -24,7 +24,8 @@ public class BFS extends Strategy{
     @Override
     public State findSolution(char[] order) {
         long start = System.nanoTime();
-        if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)) {
+        if (isSolved(initialState, solutionState)) {
+            data = new Data(0);
             return initialState;
         }
         visited = new LinkedList<>();
@@ -32,18 +33,19 @@ public class BFS extends Strategy{
         visited.add(initialState);
         closed.add(initialState);
         int visitedSize = 0;
+        int closedSize = 0;
         long end;
         while (!visited.isEmpty()) {
             State currentNode = visited.remove();
-            visitedSize++;
+            closedSize++;
             max = currentNode.depth;
             for (State n : currentNode.generateNeighbours(order)) {
                 if (isSolved(n, solutionState)) {
                     solutionPath = Path.getSolutionPath(n, closed);
-                    System.out.println(solutionPath);
+                    //System.out.println(solutionPath);
                     max = n.depth;
                     end = System.nanoTime();
-                    data = new Data(n.depth, visitedSize, closed.size(), max, end - start);
+                    data = new Data(visitedSize, closedSize, max, end - start, solutionPath);
                     solutionPath = "";
                     return n;
                 }
@@ -51,10 +53,10 @@ public class BFS extends Strategy{
                     visited.add(n);
                     closed.add(n);
                 }
+                visitedSize++;
             }
         }
-        end = System.nanoTime();
-        data = new Data(-1, visited.size(), closed.size(), max, end - start);
+        data = new Data(-1);
         return null;
     }
 
