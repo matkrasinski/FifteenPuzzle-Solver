@@ -17,18 +17,17 @@ public class BFS extends Strategy{
             data = new Data(0);
             return initialState;
         }
-        int visitedSize = 0;
-        int closedSize = 0;
         visited = new LinkedList<>();
         closed = new HashSet<>();
         visited.add(initialState);
-        closed.add(initialState);
-
+        int visitedSize = 1;
+        int closedSize = 1;
         long end;
         while (!visited.isEmpty()) {
             State currentNode = visited.remove();
-            closedSize++;
             max = currentNode.depth;
+            closed.add(currentNode);
+            closedSize++;
             for (State n : currentNode.generateNeighbours(order)) {
                 if (isSolved(n, solutionState)) {
                     solutionPath = Path.getSolutionPath(n, closed);
@@ -38,10 +37,9 @@ public class BFS extends Strategy{
                     solutionPath = "";
                     return n;
                 }
-                if(!closed.contains(n)) {
+                if(!closed.contains(n) && !visited.contains(n)) {
                     visited.add(n);
                     visitedSize++;
-                    closed.add(n);
                 }
             }
         }

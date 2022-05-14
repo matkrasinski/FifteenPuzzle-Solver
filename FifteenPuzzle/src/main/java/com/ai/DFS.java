@@ -19,20 +19,22 @@ public class DFS extends Strategy{
             return initialState;
         }
         int maxDepth = 25;
+        int visitedSize = 0;
+        int closedSize = 0;
         List<State> neighbours;
         visited = new Stack<>();
         closed = new HashSet<>();
         visited.push(initialState);
+        visitedSize++;
         long end;
-        int visitedSize = 0;
-        int closedSize = 0;
+
         while (!visited.isEmpty()) {
             State currentNode = visited.pop();
 
             if (!closed.contains(currentNode) && currentNode.depth <  maxDepth) {
-                closedSize++;
                 max = currentNode.depth;
                 closed.add(currentNode);
+                closedSize++;
                 neighbours = currentNode.generateNeighbours(order);
                 Collections.reverse(neighbours);
 
@@ -46,8 +48,8 @@ public class DFS extends Strategy{
                         solutionPath = "";
                         return n;
                     }
-                    visitedSize++;
                     visited.push(n);
+                    visitedSize++;
                 }
             }
         }

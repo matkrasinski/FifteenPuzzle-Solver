@@ -1,7 +1,5 @@
 package com.ai;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class Main {
@@ -11,8 +9,8 @@ public class Main {
                                         {13,14,15,0}};
     public static State goalState = new State(goalPuzzle);
     public static void main(String[] args) {
-        Strategy strat = null;
-        String strategy = args[0];
+        Strategy strategy = null;
+        String strategyName = args[0];
         String metric = args[1];
         String initialInputName = args[2];
         String initialOutputName = args[3];
@@ -21,19 +19,19 @@ public class Main {
 
         State state = FileManager.initialState(initialInputName);
 
-        if (Objects.equals(strategy, "astr")) {
-            strat = new AStar(goalState, state, metric);
+        if (Objects.equals(strategyName, "astr")) {
+            strategy = new AStar(goalState, state, metric);
             order = new char[]{'R', 'D', 'U', 'L'};
-        } else if (Objects.equals(strategy, "bfs")) {
-            strat = new BFS(goalState, state);
-        } else if (Objects.equals(strategy, "dfs")) {
-            strat = new DFS(goalState, state);
+        } else if (Objects.equals(strategyName, "bfs")) {
+            strategy = new BFS(goalState, state);
+        } else if (Objects.equals(strategyName, "dfs")) {
+            strategy = new DFS(goalState, state);
         }
 
-        assert strat != null;
-        strat.findSolution(order);
-        FileManager.saveSolutionToFile(strat.data, initialOutputName);
-        FileManager.saveStatsToFile(strat.data, initialStatName);
+        assert strategy != null;
+        strategy.findSolution(order);
+        FileManager.saveSolutionToFile(strategy.data, initialOutputName);
+        FileManager.saveStatsToFile(strategy.data, initialStatName);
     }
 
     public static char[] createOrder(String strOrd) {

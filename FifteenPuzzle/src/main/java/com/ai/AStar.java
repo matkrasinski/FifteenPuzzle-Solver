@@ -22,9 +22,12 @@ public class AStar extends Strategy{
             data = new Data(0);
             return initialState;
         }
+        int visitedSize = 0;
+        int closedSize = 0;
         visited = new PriorityQueue<>();
         closed = new HashSet<>();
         visited.add(new State(initialState, 0));
+        visitedSize++;
         long end;
 
         while(!visited.isEmpty()) {
@@ -32,19 +35,21 @@ public class AStar extends Strategy{
             max = currentNode.depth;
             if (isSolved(currentNode, solutionState)) {
                 solutionPath = Path.getSolutionPath(currentNode, closed);
-                //System.out.println(solutionPath);
                 max = currentNode.depth;
                 end = System.nanoTime();
-                data = new Data(visited.size(), closed.size(), max, end - start, solutionPath);
+                data = new Data(visitedSize, closedSize, max, end - start, solutionPath);
                 solutionPath = "";
                 return currentNode;
             }
             closed.add(currentNode);
+            closedSize++;
             for (State n : currentNode.generateNeighbours(order)) {
                 if (!closed.contains(n)) {
                     int f = metric.estimateDistanceToSolutionState(n, solutionState);
-                    if (!visited.contains(n))
+                    if (!visited.contains(n)) {
                         visited.add(new State(n, f));
+                        visitedSize++;
+                    }
                     else
                         if (n.priority > f)
                             update(n, f);
