@@ -73,8 +73,6 @@ public class FileManager {
                 .append(infos.getMaxDepth()).append("\n")
                 .append(String.format("%.3f", infos.getTime()));
 
-
-
         return ret.toString();
     }
 

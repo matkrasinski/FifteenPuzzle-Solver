@@ -12,14 +12,12 @@ public class Data {
     private double time;
     private String solutionPath = "";
 
-    public Data( int visitedStates, int closedStates, int maxDepth, double time, String solutionPath) {
+    public Data(int visitedStates, int closedStates, int maxDepth, double time, String solutionPath) {
         this.solutionLength = solutionPath.length();
         this.visitedStates = visitedStates;
         this.closedStates = closedStates;
         this.maxDepth = maxDepth;
         this.time = BigDecimal.valueOf(time/1e+6).doubleValue();
-
-
         this.solutionPath = solutionPath;
     }
     public Data(int solutionLength) {

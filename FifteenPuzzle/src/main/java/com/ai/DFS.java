@@ -24,7 +24,7 @@ public class DFS extends Strategy{
         closed = new HashSet<>();
         visited.push(initialState);
         long end;
-        int visitedSize = 1;
+        int visitedSize = 0;
         int closedSize = 0;
         while (!visited.isEmpty()) {
             State currentNode = visited.pop();

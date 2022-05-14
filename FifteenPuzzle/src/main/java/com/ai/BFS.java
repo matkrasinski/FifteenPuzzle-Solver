@@ -10,17 +10,6 @@ public class BFS extends Strategy{
         super(solutionState, initialState);
     }
 
-//    public State solutionState;
-//    public State initialState;
-//    public String solutionPath = "";
-//    public Set<State> closed;
-//    public Queue<State> visited;
-//
-//    public BFS(State goalState, State initState) {
-//        this.solutionState = goalState;
-//        this.initialState = initState;
-//    }
-
     @Override
     public State findSolution(char[] order) {
         long start = System.nanoTime();
@@ -31,29 +20,29 @@ public class BFS extends Strategy{
         visited = new LinkedList<>();
         closed = new HashSet<>();
         visited.add(initialState);
-        closed.add(initialState);
-        int visitedSize = 0;
-        int closedSize = 0;
+        int visitedSize = 1;
+        int closedSize = 1;
         long end;
         while (!visited.isEmpty()) {
             State currentNode = visited.remove();
-            closedSize++;
             max = currentNode.depth;
+            if(!closed.contains(currentNode)) {
+                closed.add(currentNode);
+                visitedSize++;
+            }
             for (State n : currentNode.generateNeighbours(order)) {
                 if (isSolved(n, solutionState)) {
                     solutionPath = Path.getSolutionPath(n, closed);
-                    //System.out.println(solutionPath);
                     max = n.depth;
                     end = System.nanoTime();
                     data = new Data(visitedSize, closedSize, max, end - start, solutionPath);
                     solutionPath = "";
                     return n;
                 }
-                if (!closed.contains(n)) {
+                if(!closed.contains(n) && !visited.contains(n)) {
                     visited.add(n);
-                    closed.add(n);
+                    closedSize++;
                 }
-                visitedSize++;
             }
         }
         data = new Data(-1);

@@ -68,12 +68,14 @@ public class State implements Comparable<State> {
         }
         return neighbours;
     }
+
     public boolean canMove(char direction) {
         return ((zeroIndex.y != 0 && direction == 'U') ||
                 (zeroIndex.y != puzzle.length - 1 && direction == 'D') ||
                 (zeroIndex.x != 0 && direction == 'L') ||
                 (zeroIndex.x != puzzle.length - 1) && direction == 'R') && isNotGoingBack(direction);
     }
+
     public int[][] move(char direction) {
         int[][] childPuzzle = new int[puzzle.length][puzzle[0].length];
 
