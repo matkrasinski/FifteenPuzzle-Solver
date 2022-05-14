@@ -12,7 +12,6 @@ public class Main {
     public static State goalState = new State(goalPuzzle);
     public static void main(String[] args) {
         Strategy strat = null;
-
         String strategy = args[0];
         String metric = args[1];
         String initialInputName = args[2];

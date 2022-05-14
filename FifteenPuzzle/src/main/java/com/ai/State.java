@@ -17,7 +17,7 @@ public class State implements Comparable<State> {
     public int id;
     public int priority;
 
-    public State(int[][] puzzle){
+    public State(int[][] puzzle) {
         this.puzzle = puzzle;
         this.width = puzzle[0].length;
         this.height = puzzle.length;

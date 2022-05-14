@@ -28,8 +28,9 @@ public class DFS extends Strategy{
         int closedSize = 0;
         while (!visited.isEmpty()) {
             State currentNode = visited.pop();
-            closedSize++;
+
             if (!closed.contains(currentNode) && currentNode.depth <  maxDepth) {
+                closedSize++;
                 max = currentNode.depth;
                 closed.add(currentNode);
                 neighbours = currentNode.generateNeighbours(order);

@@ -15,8 +15,7 @@ public class AStar extends Strategy{
             this.metric = new Manhattan();
         }
     }
-
-
+    @Override
     public State findSolution(char[] order) {
         long start = System.nanoTime();
         if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)) {
@@ -32,8 +31,8 @@ public class AStar extends Strategy{
             State currentNode = visited.remove();
             max = currentNode.depth;
             if (isSolved(currentNode, solutionState)) {
-                //solutionPath = Path.getSolutionPath(currentNode, closed);
-                System.out.println(solutionPath);
+                solutionPath = Path.getSolutionPath(currentNode, closed);
+                //System.out.println(solutionPath);
                 max = currentNode.depth;
                 end = System.nanoTime();
                 data = new Data(visited.size(), closed.size(), max, end - start, solutionPath);
