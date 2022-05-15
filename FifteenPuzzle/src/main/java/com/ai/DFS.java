@@ -14,11 +14,7 @@ public class DFS extends Strategy{
     @Override
     public State findSolution(char[] order) {
         long start = System.nanoTime();
-        if (Arrays.deepEquals(initialState.puzzle, solutionState.puzzle)){
-            data = new Data(0);
-            return initialState;
-        }
-        int maxDepth = 25;
+        int maxDepth = 22;
         int visitedSize = 0;
         int closedSize = 0;
         List<State> neighbours;
@@ -30,24 +26,21 @@ public class DFS extends Strategy{
 
         while (!visited.isEmpty()) {
             State currentNode = visited.pop();
-
-            if (!closed.contains(currentNode) && currentNode.depth <  maxDepth) {
+            if (isSolved(currentNode, solutionState)){
+                solutionPath = Path.getSolutionPath(currentNode, closed);
                 max = currentNode.depth;
+                end = System.nanoTime();
+                data = new Data( visitedSize, closedSize, max, end - start, solutionPath);
+                solutionPath = "";
+                return currentNode;
+            }
+            if(!closed.contains(currentNode) && currentNode.depth < maxDepth) {
                 closed.add(currentNode);
                 closedSize++;
+
                 neighbours = currentNode.generateNeighbours(order);
                 Collections.reverse(neighbours);
-
                 for (State n : neighbours) {
-                    if (isSolved(n, solutionState)){
-                        solutionPath = Path.getSolutionPath(n, closed);
-                        //System.out.println(solutionPath);
-                        max = n.depth;
-                        end = System.nanoTime();
-                        data = new Data( visitedSize, closedSize, max, end - start, solutionPath);
-                        solutionPath = "";
-                        return n;
-                    }
                     visited.push(n);
                     visitedSize++;
                 }
